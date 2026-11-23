@@ -22,16 +22,21 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: '8.2'
+    - name: Install Gradle 8.2
+      run: |
+        wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        unzip -q gradle-8.2-bin.zip -d $HOME
+        echo "$HOME/gradle-8.2/bin" >> $GITHUB_PATH
+
+    - name: Verify Gradle
+      run: gradle --version
 
     - name: Build Debug APK
-      run: gradle assembleDebug --no-daemon
+      run: gradle assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: VPNToggle-debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
